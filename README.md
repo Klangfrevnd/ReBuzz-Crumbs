@@ -1,3 +1,6 @@
+### Join the discussion on Discord:  
+https://discord.gg/vPE4THRBNT
+
 # ReBuzz
 ReBuzz is a modular digital audio workstation (DAW) built upon the foundation of [Jeskola Buzz](https://jeskola.net/buzz/) software. Written in C#, ReBuzz combines modern features with the beloved workflow of its predecessor. While it’s still in development, users should exercise some caution regarding stability and other potential uncertainties. The primary focus is on providing a stable experience and robust VST support.
 
@@ -94,7 +97,6 @@ All the basic functionality is implemented but there many areas to improve. In g
 - [ ] Improve file handling to support older songs
 - [ ] Reduce latency, optimize code
 
-### Join the discussion on Discord:  
-https://discord.gg/vPE4THRBNT
+
 
 Let's make this a good one.
