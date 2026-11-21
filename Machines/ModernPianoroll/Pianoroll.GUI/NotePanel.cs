@@ -8,168 +8,23 @@ namespace Pianoroll.GUI
         List<NoteVisual> children;
         Editor ped;
         int firstBeat;
-
         public IEnumerable<NoteVisual> NoteVisuals { get { return children; } }
-
         public bool IsEmpty { get { return children.Count == 0; } }
 
-        public NotePanel(Editor ped, int fb)
-        {
-            this.ped = ped;
-            this.firstBeat = fb;
-            children = new List<NoteVisual>();
-
-        }
-
-        public NoteVisual GetNoteVisual(int key)
-        {
-            foreach (NoteVisual nv in children)
-                if (nv.Note.Note == key)
-                    return nv;
-
-            return null;
-        }
-
-        public void RemoveNoteVisual(NoteVisual nv)
-        {
-            children.Remove(nv);
-            RemoveVisualChild(nv);
-        }
-
-        public void Clear()
-        {
-            foreach (NoteVisual nv in children)
-                RemoveVisualChild(nv);
-
-            children.Clear();
-        }
-
-        public void AddNote(NoteEvent ne, bool newnote)
-        {
-            foreach (NoteVisual n in children)
-            {
-                if (ne.Time == n.Note.Time && ne.Note == n.Note.Note)
-                {
-                    children.Remove(n);
-                    RemoveVisualChild(n);
-                    break;
-                }
-
-            }
-
-            NoteVisual nv = new NoteVisual(ne, ped, newnote);
-            children.Add(nv);
-            AddVisualChild(nv);
-        }
-
-        public void SelectNotes(Int32Rect rect, NoteSet notes, bool add)
-        {
-            foreach (NoteVisual n in children)
-            {
-                if (n.Note.InRect(rect))
-                {
-                    notes.Add(n.Note);
-                    n.Selected = true;
-                }
-                else if (!add)
-                {
-                    n.Selected = false;
-                }
-            }
-        }
-
-        public void SelectNotes(int t, NoteSet notes, bool add)
-        {
-            foreach (NoteVisual n in children)
-            {
-                if (n.Note.Time == t)
-                {
-                    notes.Add(n.Note);
-                    n.Selected = true;
-                }
-                else if (!add)
-                {
-                    n.Selected = false;
-                }
-            }
-        }
-
-        public void SelectNote(NoteEvent ne, NoteSet notes, bool add)
-        {
-            foreach (NoteVisual n in children)
-            {
-                if (n.Note.Equals(ne))
-                {
-                    notes.Add(n.Note);
-                    n.Selected = true;
-                }
-                else if (!add)
-                {
-                    n.Selected = false;
-                }
-            }
-        }
-
-        public void DeleteNote(NoteEvent ne)
-        {
-            foreach (NoteVisual n in children)
-            {
-                if (n.Note.Equals(ne))
-                {
-                    children.Remove(n);
-                    RemoveVisualChild(n);
-                    break;
-                }
-            }
-        }
-
-        public void SetVelocity(NoteEvent ne, int velocity)
-        {
-            foreach (NoteVisual n in children)
-            {
-                if (n.Note.Equals(ne))
-                {
-                    n.Velocity = velocity;
-                    break;
-                }
-            }
-        }
-
-        protected override int VisualChildrenCount
-        {
-            get { return children.Count; }
-        }
-
-        protected override Visual GetVisualChild(int index)
-        {
-            if (index < 0 || index >= children.Count)
-                throw new ArgumentOutOfRangeException();
-
-            return (Visual)children[index];
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            Size childSize = new Size(double.PositiveInfinity, double.PositiveInfinity);
-
-            foreach (UIElement child in children)
-                child.Measure(childSize);
-
-            return new Size();
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            foreach (NoteVisual note in children)
-            {
-                double x = (note.Note.Note - ped.PatDim.FirstMidiNote) * ped.PatDim.NoteWidth;
-                double y = note.Note.Time * ped.PatDim.BeatHeight / PianorollGlobal.TicksPerBeat;
-                y -= firstBeat * ped.PatDim.BeatHeight;
-
-                note.Arrange(new Rect(new Point(x, y), note.DesiredSize));
-            }
-
-            return finalSize;
-        }
+        public NotePanel(Editor ped, int firstBeat) { this.ped = ped; this.firstBeat = firstBeat; children = new List<NoteVisual>(); }
+        public NoteVisual GetNoteVisual(int key) { return children.FirstOrDefault(n => n.Note.Note == key); }
+        public void RemoveNoteVisual(NoteVisual visual) { children.Remove(visual); RemoveVisualChild(visual); InvalidateMeasure(); }
+        public void Clear() { foreach (var visual in children) RemoveVisualChild(visual); children.Clear(); InvalidateMeasure(); }
+        public void AddNote(NoteEvent note, bool newnote) { var old = children.FirstOrDefault(n => n.Note.Time == note.Time && n.Note.Note == note.Note); if (old != null) { children.Remove(old); RemoveVisualChild(old); } var visual = new NoteVisual(note, ped, newnote); children.Add(visual); AddVisualChild(visual); InvalidateMeasure(); }
+        public void UpdateNote(NoteEvent original, NoteEvent updated) { var visual = children.FirstOrDefault(n => n.Note.Equals(original)); if (visual != null) { visual.Note = updated; visual.InvalidateVisual(); InvalidateMeasure(); } }
+        public void SelectNotes(Int32Rect rect, NoteSet notes, bool add) { foreach (var visual in children) { if (visual.Note.InRect(rect)) { if (!notes.Contains(visual.Note)) notes.Add(visual.Note); visual.Selected = true; } else if (!add) visual.Selected = false; } }
+        public void SelectNotes(int time, NoteSet notes, bool add) { foreach (var visual in children) { if (visual.Note.Time == time) { if (!notes.Contains(visual.Note)) notes.Add(visual.Note); visual.Selected = true; } else if (!add) visual.Selected = false; } }
+        public void SelectNote(NoteEvent note, NoteSet notes, bool add) { foreach (var visual in children) { if (visual.Note.Equals(note)) { if (!notes.Contains(visual.Note)) notes.Add(visual.Note); visual.Selected = true; } else if (!add) visual.Selected = false; } }
+        public void DeleteNote(NoteEvent note) { var visual = children.FirstOrDefault(n => n.Note.Equals(note)); if (visual != null) { children.Remove(visual); RemoveVisualChild(visual); InvalidateMeasure(); } }
+        public void SetVelocity(NoteEvent note, int velocity) { var visual = children.FirstOrDefault(n => n.Note.Equals(note)); if (visual != null) visual.Velocity = velocity; }
+        protected override int VisualChildrenCount { get { return children.Count; } }
+        protected override Visual GetVisualChild(int index) { if (index < 0 || index >= children.Count) throw new ArgumentOutOfRangeException(); return children[index]; }
+        protected override Size MeasureOverride(Size availableSize) { Size size = new Size(double.PositiveInfinity, double.PositiveInfinity); foreach (UIElement child in children) child.Measure(size); return new Size(); }
+        protected override Size ArrangeOverride(Size finalSize) { foreach (var visual in children) { double x = (visual.Note.Note - ped.PatDim.FirstMidiNote) * ped.PatDim.NoteWidth; double y = visual.Note.Time * ped.PatDim.BeatHeight / PianorollGlobal.TicksPerBeat - firstBeat * ped.PatDim.BeatHeight; visual.Arrange(new Rect(new Point(x, y), visual.DesiredSize)); } return finalSize; }
     }
 }
