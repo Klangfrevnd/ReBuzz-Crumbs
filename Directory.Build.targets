@@ -1,0 +1,4 @@
+<Project>
+  <Target Name="ForcePerformRestore" AfterTargets="BeforeBuild" />
+  <Target Name="RemoveEmptyObj" AfterTargets="AfterBuild" />
+</Project>
