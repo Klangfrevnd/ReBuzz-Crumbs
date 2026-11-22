@@ -23,7 +23,6 @@
     <Platforms>AnyCPU;x64</Platforms>
     <UseWindowsThreadPool>true</UseWindowsThreadPool>
 	<CETCompat>false</CETCompat>
-	<IntermediateOutputPath>$(SolutionDir)build\$(Configuration)\$(Platform)\ReBuzz\obj</IntermediateOutputPath>
   <OutputPath>$(SolutionDir)bin\$(Configuration)\$(Platform)</OutputPath>
 	<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
