@@ -21,10 +21,10 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore ReBuzz/ReBuzz.csproj -p:BaseIntermediateOutputPath=obj\ -p:IntermediateOutputPath=obj\
+      run: dotnet restore ReBuzz/ReBuzz.csproj /p:BaseIntermediateOutputPath=obj/ /p:IntermediateOutputPath=obj/
 
     - name: Build ReBuzz (Release)
-      run: dotnet build ReBuzz/ReBuzz.csproj --configuration Release --no-restore -p:BaseIntermediateOutputPath=obj\ -p:IntermediateOutputPath=obj\
+      run: dotnet build ReBuzz/ReBuzz.csproj --configuration Release --no-restore /p:BaseIntermediateOutputPath=obj/ /p:IntermediateOutputPath=obj/
 
     - name: Upload release artifacts
       uses: actions/upload-artifact@v4
